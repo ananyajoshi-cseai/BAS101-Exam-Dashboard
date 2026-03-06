@@ -6,6 +6,24 @@
 
 An interactive, high-utility study dashboard designed for **Applied Mathematics (BAS 101)** students at **IGDTUW**. This project streamlines midterm and end-term revision by combining data visualization with active recall strategies.
 
+## 📸 App Preview
+
+### 📊 Exam Analytics & Topic Frequency
+Visualizes which topics appear most frequently in the last three years of IGDTUW papers.
+![Exam Analytics Interface](./screenshots/dashboard1.png)
+
+### 📄 Interactive PYQs with Solutions
+Toggleable step-by-step solutions for past paper questions (Linear Algebra & Calculus).
+![PYQ Solution View](./screenshots/Dashboard%202.png)
+
+### 📚 Study Materials & Methods
+Quick access to high-yield formulas like Euler's and Leibnitz Theorem.
+![Key Methods Section](./screenshots/Dashboard%203.png)
+
+### 📝 Predicted Mock Exam
+A full-length practice paper designed based on current exam trends.
+![Mock Exam Interface](./screenshots/Dashboard%204.png)
+---
 ## 🚀 Features
 
 * **Exam Topic Analytics:** Dynamic bar charts powered by **Chart.js** that visualize the frequency of topics across three years of PYQs (Oct '24, Mar '25, Oct '25).
