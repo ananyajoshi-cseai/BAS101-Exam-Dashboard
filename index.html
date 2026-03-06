@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BAS101 Exam Dashboard – Applied Mathematics | IGDTUW</title>
+
+  <!-- Tailwind CSS (local build; CDN fallback for deployment) -->
+  <link rel="stylesheet" href="assets/tailwind.css" />
+
+  <!-- Chart.js (local copy; CDN fallback for deployment) -->
+  <script>
+    (function(){
+      var s=document.createElement('script');
+      s.src='assets/chart.umd.min.js';
+      s.onerror=function(){
+        var f=document.createElement('script');
+        f.src='https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js';
+        document.head.appendChild(f);
+      };
+      document.head.appendChild(s);
+    })();
+  </script>
+
+  <!-- MathJax -->
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+      options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'] },
+      startup: { ready() { MathJax.startup.defaultReady(); } }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+
+  <style>
+    /* Thin scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #a5b4fc; border-radius: 3px; }
+
+    /* Collapsible solution panels */
+    .solution-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+    .solution-body.open { max-height: 1200px; }
+
+    /* Active nav item */
+    .nav-item.active { background-color: #4f46e5; color: #fff; }
+
+    /* Mock exam timer flash */
+    @keyframes pulse-red { 0%,100%{color:#ef4444} 50%{color:#991b1b} }
+    .timer-warning { animation: pulse-red 1s infinite; }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+<!-- ===== TOP HEADER ===== -->
+<header class="bg-indigo-600 text-white shadow-lg sticky top-0 z-50">
+  <div class="max-w-screen-xl mx-auto flex items-center justify-between px-4 py-3">
+    <div class="flex items-center gap-3">
+      <span class="text-2xl">📐</span>
+      <div>
+        <h1 class="text-lg font-bold leading-tight">BAS101 Exam Dashboard</h1>
+        <p class="text-xs text-indigo-200">Applied Mathematics · IGDTUW · CSE-AI</p>
+      </div>
+    </div>
+    <!-- Mobile menu toggle -->
+    <button id="menuToggle" class="lg:hidden p-2 rounded hover:bg-indigo-800 transition">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<!-- ===== LAYOUT ===== -->
+<div class="max-w-screen-xl mx-auto flex min-h-screen">
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar"
+    class="hidden lg:flex flex-col w-60 shrink-0 bg-white border-r border-gray-200 pt-6 pb-10 px-3 sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto">
+    <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest px-3 mb-3">Navigation</p>
+    <nav class="flex flex-col gap-1" id="sideNav">
+      <button data-target="overview"   class="nav-item active text-left px-3 py-2 rounded-lg text-sm font-medium hover:bg-indigo-50 transition">🏠 Overview</button>
+      <button data-target="analytics"  class="nav-item        text-left px-3 py-2 rounded-lg text-sm font-medium hover:bg-indigo-50 transition">📊 Analytics</button>
+      <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest px-3 mt-4 mb-2">Unit 1 – Algebra</p>
+      <button data-target="matrices"   class="nav-item        text-left px-3 py-2 rounded-lg text-sm font-medium hover:bg-indigo-50 transition">🔢 Matrices</button>
+      <button data-target="eigenvalues"class="nav-item        text-left px-3 py-2 rounded-lg text-sm font-medium hover:bg-indigo-50 transition">λ Eigenvalues</button>
+      <button data-target="complex"    class="nav-item        text-left px-3 py-2 rounded-lg text-sm font-medium hover:bg-indigo-50 transition">ℂ Complex Numbers</button>
+      <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest px-3 mt-4 mb-2">Unit 2 – Calculus</p>
+      <button data-target="limits"     class="nav-item        text-left px-3 py-2 rounded-lg text-sm font-medium hover:bg-indigo-50 transition">∞ Limits &amp; Continuity</button>
+      <button data-target="derivatives"class="nav-item        text-left px-3 py-2 rounded-lg text-sm font-medium hover:bg-indigo-50 transition">∂ Derivatives</button>
+      <button data-target="integration"class="nav-item        text-left px-3 py-2 rounded-lg text-sm font-medium hover:bg-indigo-50 transition">∫ Integration</button>
+      <button data-target="series"     class="nav-item        text-left px-3 py-2 rounded-lg text-sm font-medium hover:bg-indigo-50 transition">Σ Series</button>
+      <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest px-3 mt-4 mb-2">Tools</p>
+      <button data-target="mockexam"   class="nav-item        text-left px-3 py-2 rounded-lg text-sm font-medium hover:bg-indigo-50 transition">📝 Mock Exam</button>
+      <button data-target="formulasheet" class="nav-item      text-left px-3 py-2 rounded-lg text-sm font-medium hover:bg-indigo-50 transition">📋 Formula Sheet</button>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-1 px-4 py-8 lg:px-8 overflow-x-hidden">
+
+    <!-- MOBILE NAV DRAWER -->
+    <div id="mobileNav" class="hidden lg:hidden mb-6 bg-white rounded-xl shadow border border-gray-200 p-4 flex flex-wrap gap-2">
+      <button data-target="overview"    class="mob-nav px-3 py-1 text-sm rounded-full bg-indigo-100 text-indigo-600 font-medium">🏠 Overview</button>
+      <button data-target="analytics"   class="mob-nav px-3 py-1 text-sm rounded-full bg-gray-100 text-gray-700 font-medium">📊 Analytics</button>
+      <button data-target="matrices"    class="mob-nav px-3 py-1 text-sm rounded-full bg-gray-100 text-gray-700 font-medium">Matrices</button>
+      <button data-target="eigenvalues" class="mob-nav px-3 py-1 text-sm rounded-full bg-gray-100 text-gray-700 font-medium">Eigenvalues</button>
+      <button data-target="complex"     class="mob-nav px-3 py-1 text-sm rounded-full bg-gray-100 text-gray-700 font-medium">Complex</button>
+      <button data-target="limits"      class="mob-nav px-3 py-1 text-sm rounded-full bg-gray-100 text-gray-700 font-medium">Limits</button>
+      <button data-target="derivatives" class="mob-nav px-3 py-1 text-sm rounded-full bg-gray-100 text-gray-700 font-medium">Derivatives</button>
+      <button data-target="integration" class="mob-nav px-3 py-1 text-sm rounded-full bg-gray-100 text-gray-700 font-medium">Integration</button>
+      <button data-target="series"      class="mob-nav px-3 py-1 text-sm rounded-full bg-gray-100 text-gray-700 font-medium">Series</button>
+      <button data-target="mockexam"    class="mob-nav px-3 py-1 text-sm rounded-full bg-gray-100 text-gray-700 font-medium">Mock Exam</button>
+      <button data-target="formulasheet"class="mob-nav px-3 py-1 text-sm rounded-full bg-gray-100 text-gray-700 font-medium">Formulas</button>
+    </div>
+
+    <!-- ===== SECTION: OVERVIEW ===== -->
+    <section id="overview" class="section">
+      <h2 class="text-2xl font-bold text-indigo-600 mb-1">Welcome to BAS101 Dashboard</h2>
+      <p class="text-gray-500 mb-6">Your one-stop revision companion for Applied Mathematics – Units 1 &amp; 2.</p>
+
+      <!-- Progress cards -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white rounded-xl shadow p-5 border-l-4 border-indigo-500 text-center">
+          <p class="text-3xl font-bold text-indigo-600">7</p>
+          <p class="text-sm text-gray-500 mt-1">Topics Covered</p>
+        </div>
+        <div class="bg-white rounded-xl shadow p-5 border-l-4 border-emerald-500 text-center">
+          <p class="text-3xl font-bold text-emerald-600">18</p>
+          <p class="text-sm text-gray-500 mt-1">PYQs Available</p>
+        </div>
+        <div class="bg-white rounded-xl shadow p-5 border-l-4 border-amber-500 text-center">
+          <p class="text-3xl font-bold text-amber-600" id="practiceScore">0</p>
+          <p class="text-sm text-gray-500 mt-1">Practice Score</p>
+        </div>
+        <div class="bg-white rounded-xl shadow p-5 border-l-4 border-rose-500 text-center">
+          <p class="text-3xl font-bold text-rose-600" id="mocksTaken">0</p>
+          <p class="text-sm text-gray-500 mt-1">Mocks Taken</p>
+        </div>
+      </div>
+
+      <!-- Quick topic links -->
+      <h3 class="font-semibold text-gray-700 mb-3">Quick Jump</h3>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <button data-target="matrices"    class="quick-link bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-medium rounded-xl p-4 text-left transition">
+          <span class="text-2xl">🔢</span><br/>Matrices &amp; Rank
+        </button>
+        <button data-target="eigenvalues" class="quick-link bg-purple-50 hover:bg-purple-100 text-purple-700 font-medium rounded-xl p-4 text-left transition">
+          <span class="text-2xl">λ</span><br/>Eigenvalues &amp; Vectors
+        </button>
+        <button data-target="complex"     class="quick-link bg-sky-50 hover:bg-sky-100 text-sky-700 font-medium rounded-xl p-4 text-left transition">
+          <span class="text-2xl">ℂ</span><br/>Complex Numbers
+        </button>
+        <button data-target="limits"      class="quick-link bg-teal-50 hover:bg-teal-100 text-teal-700 font-medium rounded-xl p-4 text-left transition">
+          <span class="text-2xl">∞</span><br/>Limits &amp; Continuity
+        </button>
+        <button data-target="derivatives" class="quick-link bg-rose-50 hover:bg-rose-100 text-rose-700 font-medium rounded-xl p-4 text-left transition">
+          <span class="text-2xl">∂</span><br/>Differential Calculus
+        </button>
+        <button data-target="integration" class="quick-link bg-amber-50 hover:bg-amber-100 text-amber-700 font-medium rounded-xl p-4 text-left transition">
+          <span class="text-2xl">∫</span><br/>Integral Calculus
+        </button>
+      </div>
+    </section>
+
+    <!-- ===== SECTION: ANALYTICS ===== -->
+    <section id="analytics" class="section hidden">
+      <h2 class="text-2xl font-bold text-indigo-600 mb-1">Exam Analytics</h2>
+      <p class="text-gray-500 mb-6">PYQ frequency analysis to guide your revision priority.</p>
+
+      <div class="grid md:grid-cols-2 gap-6 mb-6">
+        <!-- Topic-wise marks chart -->
+        <div class="bg-white rounded-xl shadow p-5">
+          <h3 class="font-semibold text-gray-700 mb-4">Topic-wise Marks Distribution (5 Years)</h3>
+          <canvas id="marksChart" height="220"></canvas>
+        </div>
+        <!-- Question type breakdown -->
+        <div class="bg-white rounded-xl shadow p-5">
+          <h3 class="font-semibold text-gray-700 mb-4">Question Type Breakdown</h3>
+          <canvas id="typeChart" height="220"></canvas>
+        </div>
+      </div>
+
+      <!-- Year-wise difficulty -->
+      <div class="bg-white rounded-xl shadow p-5">
+        <h3 class="font-semibold text-gray-700 mb-4">Year-wise Difficulty Trend</h3>
+        <canvas id="difficultyChart" height="130"></canvas>
+      </div>
+
+      <!-- Tips card -->
+      <div class="mt-6 bg-indigo-50 border border-indigo-200 rounded-xl p-5">
+        <h3 class="font-semibold text-indigo-700 mb-2">📌 Revision Priority (based on data)</h3>
+        <ol class="list-decimal list-inside text-sm text-gray-700 space-y-1">
+          <li><span class="font-medium">Eigenvalues &amp; Eigenvectors</span> — asked every year (avg 14 marks)</li>
+          <li><span class="font-medium">Integration (improper &amp; beta/gamma)</span> — 12 marks average</li>
+          <li><span class="font-medium">Matrices &amp; Rank</span> — 10 marks average</li>
+          <li><span class="font-medium">Taylor &amp; Maclaurin Series</span> — 8 marks average</li>
+          <li><span class="font-medium">Complex Numbers (De Moivre)</span> — 7 marks average</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ===== SECTION: MATRICES ===== -->
+    <section id="matrices" class="section hidden">
+      <h2 class="text-2xl font-bold text-indigo-600 mb-1">Matrices &amp; Rank</h2>
+      <p class="text-gray-500 mb-6">Unit 1 · Row echelon, rank, inverse, and system of equations.</p>
+
+      <!-- Key concepts -->
+      <div class="bg-white rounded-xl shadow p-5 mb-5">
+        <h3 class="font-semibold text-gray-700 mb-3">Key Concepts</h3>
+        <ul class="space-y-2 text-sm text-gray-700">
+          <li>• <strong>Rank</strong> of a matrix = number of non-zero rows in its row echelon form.</li>
+          <li>• A system $AX = B$ is consistent iff $\rho(A) = \rho(A|B)$.</li>
+          <li>• Inverse exists iff $\det(A) \neq 0$ (matrix is non-singular).</li>
+          <li>• Cayley-Hamilton: every matrix satisfies its own characteristic equation.</li>
+        </ul>
+      </div>
+
+      <!-- PYQ cards -->
+      <h3 class="font-semibold text-gray-700 mb-3">Previous Year Questions</h3>
+      <div class="space-y-4">
+
+        <div class="bg-white rounded-xl shadow border border-gray-100">
+          <button class="toggle-btn w-full flex justify-between items-center px-5 py-4 text-left" data-id="m1">
+            <div>
+              <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full mr-2">2023 · 5 marks</span>
+              <span class="font-medium text-sm">Find the rank of the matrix $A = \begin{pmatrix}1&amp;2&amp;3\\4&amp;5&amp;6\\7&amp;8&amp;9\end{pmatrix}$.</span>
+            </div>
+            <span class="chevron text-gray-400 text-xl ml-4">▾</span>
+          </button>
+          <div class="solution-body" id="sol-m1">
+            <div class="px-5 pb-5 pt-1 border-t border-gray-100 text-sm text-gray-700 space-y-2">
+              <p><strong>Step 1 – Apply $R_2 \leftarrow R_2 - 4R_1$, $R_3 \leftarrow R_3 - 7R_1$:</strong></p>
+              <p>$$\begin{pmatrix}1&2&3\\0&-3&-6\\0&-6&-12\end{pmatrix}$$</p>
+              <p><strong>Step 2 – Apply $R_3 \leftarrow R_3 - 2R_2$:</strong></p>
+              <p>$$\begin{pmatrix}1&2&3\\0&-3&-6\\0&0&0\end{pmatrix}$$</p>
+              <p><strong>Conclusion:</strong> Two non-zero rows ⟹ $\rho(A) = \boxed{2}$.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow border border-gray-100">
+          <button class="toggle-btn w-full flex justify-between items-center px-5 py-4 text-left" data-id="m2">
+            <div>
+              <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full mr-2">2022 · 8 marks</span>
+              <span class="font-medium text-sm">Using Cayley-Hamilton theorem, find $A^{-1}$ for $A = \begin{pmatrix}2&1\\1&1\end{pmatrix}$.</span>
+            </div>
+            <span class="chevron text-gray-400 text-xl ml-4">▾</span>
+          </button>
+          <div class="solution-body" id="sol-m2">
+            <div class="px-5 pb-5 pt-1 border-t border-gray-100 text-sm text-gray-700 space-y-2">
+              <p><strong>Step 1 – Characteristic polynomial:</strong></p>
+              <p>$$\det(A - \lambda I) = (2-\lambda)(1-\lambda)-1 = \lambda^2 - 3\lambda + 1 = 0$$</p>
+              <p><strong>Step 2 – Cayley-Hamilton:</strong> $A^2 - 3A + I = 0$, so $A^{-1} = 3I - A$.</p>
+              <p><strong>Step 3:</strong></p>
+              <p>$$A^{-1} = \begin{pmatrix}3&0\\0&3\end{pmatrix} - \begin{pmatrix}2&1\\1&1\end{pmatrix} = \boxed{\begin{pmatrix}1&-1\\-1&2\end{pmatrix}}$$</p>
+              <p><strong>Verification:</strong> $A \cdot A^{-1} = \begin{pmatrix}2&1\\1&1\end{pmatrix}\begin{pmatrix}1&-1\\-1&2\end{pmatrix} = \begin{pmatrix}1&0\\0&1\end{pmatrix}$ ✓</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow border border-gray-100">
+          <button class="toggle-btn w-full flex justify-between items-center px-5 py-4 text-left" data-id="m3">
+            <div>
+              <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full mr-2">2021 · 7 marks</span>
+              <span class="font-medium text-sm">Solve the system: $x+2y+3z=6$, $2x+4y+6z=12$, $3x+6y+9z=18$.</span>
+            </div>
+            <span class="chevron text-gray-400 text-xl ml-4">▾</span>
+          </button>
+          <div class="solution-body" id="sol-m3">
+            <div class="px-5 pb-5 pt-1 border-t border-gray-100 text-sm text-gray-700 space-y-2">
+              <p><strong>Augmented matrix $[A|B]$:</strong></p>
+              <p>$$\begin{pmatrix}1&2&3&|&6\\2&4&6&|&12\\3&6&9&|&18\end{pmatrix}$$</p>
+              <p>After row reduction (all rows become multiples of row 1): $\rho(A) = \rho(A|B) = 1 &lt; 3$.</p>
+              <p><strong>Solution:</strong> Infinitely many solutions. Let $y = s$, $z = t$ (free variables):</p>
+              <p>$$x = 6 - 2s - 3t, \quad y = s, \quad z = t \qquad (s,t \in \mathbb{R})$$</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== SECTION: EIGENVALUES ===== -->
+    <section id="eigenvalues" class="section hidden">
+      <h2 class="text-2xl font-bold text-indigo-600 mb-1">Eigenvalues &amp; Eigenvectors</h2>
+      <p class="text-gray-500 mb-6">Unit 1 · Most frequently examined topic (every year).</p>
+
+      <div class="bg-white rounded-xl shadow p-5 mb-5">
+        <h3 class="font-semibold text-gray-700 mb-3">Key Concepts</h3>
+        <ul class="space-y-2 text-sm text-gray-700">
+          <li>• Characteristic equation: $\det(A - \lambda I) = 0$.</li>
+          <li>• Eigenvector $\mathbf{v}$ satisfies $(A - \lambda I)\mathbf{v} = \mathbf{0}$.</li>
+          <li>• Sum of eigenvalues = trace$(A)$; product = $\det(A)$.</li>
+          <li>• Diagonalisation: $A = P D P^{-1}$ where columns of $P$ are eigenvectors.</li>
+        </ul>
+      </div>
+
+      <h3 class="font-semibold text-gray-700 mb-3">Previous Year Questions</h3>
+      <div class="space-y-4">
+
+        <div class="bg-white rounded-xl shadow border border-gray-100">
+          <button class="toggle-btn w-full flex justify-between items-center px-5 py-4 text-left" data-id="e1">
+            <div>
+              <span class="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full mr-2">2023 · 10 marks</span>
+              <span class="font-medium text-sm">Find eigenvalues and eigenvectors of $A = \begin{pmatrix}4&1\\2&3\end{pmatrix}$.</span>
+            </div>
+            <span class="chevron text-gray-400 text-xl ml-4">▾</span>
+          </button>
+          <div class="solution-body" id="sol-e1">
+            <div class="px-5 pb-5 pt-1 border-t border-gray-100 text-sm text-gray-700 space-y-2">
+              <p><strong>Characteristic equation:</strong></p>
+              <p>$$\det(A-\lambda I)=(4-\lambda)(3-\lambda)-2 = \lambda^2 - 7\lambda + 10 = 0$$</p>
+              <p>$$(\lambda-5)(\lambda-2)=0 \implies \lambda_1=5,\;\lambda_2=2$$</p>
+              <p><strong>Eigenvector for $\lambda_1=5$:</strong> $(A-5I)\mathbf{v}=\mathbf{0}$</p>
+              <p>$$\begin{pmatrix}-1&1\\2&-2\end{pmatrix}\mathbf{v}=\mathbf{0} \implies v_1=v_2 \implies \mathbf{v}_1=\begin{pmatrix}1\\1\end{pmatrix}$$</p>
+              <p><strong>Eigenvector for $\lambda_2=2$:</strong> $(A-2I)\mathbf{v}=\mathbf{0}$</p>
+              <p>$$\begin{pmatrix}2&1\\2&1\end{pmatrix}\mathbf{v}=\mathbf{0} \implies 2v_1+v_2=0 \implies \mathbf{v}_2=\begin{pmatrix}1\\-2\end{pmatrix}$$</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow border border-gray-100">
+          <button class="toggle-btn w-full flex justify-between items-center px-5 py-4 text-left" data-id="e2">
+            <div>
+              <span class="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full mr-2">2022 · 12 marks</span>
+              <span class="font-medium text-sm">Diagonalize $A = \begin{pmatrix}6&-2\\-2&3\end{pmatrix}$ and compute $A^4$.</span>
+            </div>
+            <span class="chevron text-gray-400 text-xl ml-4">▾</span>
+          </button>
+          <div class="solution-body" id="sol-e2">
+            <div class="px-5 pb-5 pt-1 border-t border-gray-100 text-sm text-gray-700 space-y-2">
+              <p><strong>Eigenvalues:</strong> $\lambda^2 - 9\lambda + 14 = 0 \implies \lambda_1=7,\;\lambda_2=2$</p>
+              <p><strong>Eigenvectors:</strong> $\mathbf{v}_1 = \begin{pmatrix}2\\-1\end{pmatrix}$, $\mathbf{v}_2 = \begin{pmatrix}1\\2\end{pmatrix}$</p>
+              <p>$$P = \begin{pmatrix}2&1\\-1&2\end{pmatrix}, \quad D = \begin{pmatrix}7&0\\0&2\end{pmatrix}$$</p>
+              <p><strong>$A^4 = P D^4 P^{-1}$:</strong></p>
+              <p>$$D^4 = \begin{pmatrix}7^4&0\\0&2^4\end{pmatrix} = \begin{pmatrix}2401&0\\0&16\end{pmatrix}$$</p>
+              <p>$$P^{-1} = \tfrac{1}{5}\begin{pmatrix}2&-1\\1&2\end{pmatrix}$$</p>
+              <p>$$A^4 = \frac{1}{5}\begin{pmatrix}2&1\\-1&2\end{pmatrix}\begin{pmatrix}2401&0\\0&16\end{pmatrix}\begin{pmatrix}2&-1\\1&2\end{pmatrix}$$</p>
+              <p>$$= \frac{1}{5}\begin{pmatrix}4802&16\\-2401&32\end{pmatrix}\begin{pmatrix}2&-1\\1&2\end{pmatrix} = \frac{1}{5}\begin{pmatrix}9620&-4770\\-4770&2465\end{pmatrix} = \boxed{\begin{pmatrix}1924&-954\\-954&493\end{pmatrix}}$$</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== SECTION: COMPLEX NUMBERS ===== -->
+    <section id="complex" class="section hidden">
+      <h2 class="text-2xl font-bold text-indigo-600 mb-1">Complex Numbers</h2>
+      <p class="text-gray-500 mb-6">Unit 1 · Polar form, De Moivre's theorem, roots of unity.</p>
+
+      <div class="bg-white rounded-xl shadow p-5 mb-5">
+        <h3 class="font-semibold text-gray-700 mb-3">Key Formulas</h3>
+        <ul class="space-y-2 text-sm text-gray-700">
+          <li>• Euler's formula: $e^{i\theta} = \cos\theta + i\sin\theta$</li>
+          <li>• De Moivre: $(\cos\theta + i\sin\theta)^n = \cos n\theta + i\sin n\theta$</li>
+          <li>• Modulus: $|z| = \sqrt{a^2+b^2}$; Argument: $\arg(z) = \tan^{-1}(b/a)$</li>
+          <li>• $n$-th roots of unity: $\omega^k = e^{2\pi ik/n}$, $k=0,1,\ldots,n-1$</li>
+        </ul>
+      </div>
+
+      <h3 class="font-semibold text-gray-700 mb-3">Previous Year Questions</h3>
+      <div class="space-y-4">
+
+        <div class="bg-white rounded-xl shadow border border-gray-100">
+          <button class="toggle-btn w-full flex justify-between items-center px-5 py-4 text-left" data-id="c1">
+            <div>
+              <span class="text-xs bg-sky-100 text-sky-700 px-2 py-0.5 rounded-full mr-2">2023 · 5 marks</span>
+              <span class="font-medium text-sm">Find all cube roots of $-8$ in polar form.</span>
+            </div>
+            <span class="chevron text-gray-400 text-xl ml-4">▾</span>
+          </button>
+          <div class="solution-body" id="sol-c1">
+            <div class="px-5 pb-5 pt-1 border-t border-gray-100 text-sm text-gray-700 space-y-2">
+              <p>Write $-8 = 8e^{i\pi}$. The cube roots are:</p>
+              <p>$$z_k = 2\,e^{i(\pi + 2\pi k)/3}, \quad k=0,1,2$$</p>
+              <p>$k=0$: $z_0 = 2e^{i\pi/3} = 2(\cos 60°+ i\sin 60°) = 1 + i\sqrt{3}$</p>
+              <p>$k=1$: $z_1 = 2e^{i\pi} = -2$</p>
+              <p>$k=2$: $z_2 = 2e^{i5\pi/3} = 2(\cos 300°+ i\sin 300°) = 1 - i\sqrt{3}$</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow border border-gray-100">
+          <button class="toggle-btn w-full flex justify-between items-center px-5 py-4 text-left" data-id="c2">
+            <div>
+              <span class="text-xs bg-sky-100 text-sky-700 px-2 py-0.5 rounded-full mr-2">2022 · 6 marks</span>
+              <span class="font-medium text-sm">Prove that $\cos 3\theta = 4\cos^3\theta - 3\cos\theta$ using De Moivre's theorem.</span>
+            </div>
+            <span class="chevron text-gray-400 text-xl ml-4">▾</span>
+          </button>
+          <div class="solution-body" id="sol-c2">
+            <div class="px-5 pb-5 pt-1 border-t border-gray-100 text-sm text-gray-700 space-y-2">
+              <p>By De Moivre's theorem: $\cos 3\theta + i\sin 3\theta = (\cos\theta + i\sin\theta)^3$.</p>
+              <p>Expanding by binomial theorem (let $c=\cos\theta$, $s=\sin\theta$, $i^2=-1$, $i^3=-i$):</p>
+              <p>$$= c^3 + 3c^2(is) + 3c(is)^2 + (is)^3$$</p>
+              <p>$$= c^3 + 3ic^2 s - 3cs^2 - is^3$$</p>
+              <p>$$= (c^3 - 3cs^2) + i(3c^2 s - s^3)$$</p>
+              <p>Equating real parts and substituting $s^2 = 1-c^2$:</p>
+              <p>$$\cos 3\theta = c^3 - 3c(1-c^2) = 4c^3 - 3c = \boxed{4\cos^3\theta - 3\cos\theta}$$</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== SECTION: LIMITS ===== -->
+    <section id="limits" class="section hidden">
+      <h2 class="text-2xl font-bold text-indigo-600 mb-1">Limits &amp; Continuity</h2>
+      <p class="text-gray-500 mb-6">Unit 2 · L'Hôpital, squeeze theorem, continuity conditions.</p>
+
+      <div class="bg-white rounded-xl shadow p-5 mb-5">
+        <h3 class="font-semibold text-gray-700 mb-3">Key Rules</h3>
+        <ul class="space-y-2 text-sm text-gray-700">
+          <li>• L'Hôpital (for $0/0$ or $\infty/\infty$): $\lim \frac{f}{g} = \lim \frac{f'}{g'}$</li>
+          <li>• Standard limit: $\displaystyle\lim_{x\to 0}\frac{\sin x}{x} = 1$</li>
+          <li>• Standard limit: $\displaystyle\lim_{x\to 0}\frac{e^x - 1}{x} = 1$</li>
+          <li>• $f$ is continuous at $a$ iff $\lim_{x\to a}f(x) = f(a)$.</li>
+        </ul>
+      </div>
+
+      <h3 class="font-semibold text-gray-700 mb-3">Previous Year Questions</h3>
+      <div class="space-y-4">
+
+        <div class="bg-white rounded-xl shadow border border-gray-100">
+          <button class="toggle-btn w-full flex justify-between items-center px-5 py-4 text-left" data-id="l1">
+            <div>
+              <span class="text-xs bg-teal-100 text-teal-700 px-2 py-0.5 rounded-full mr-2">2023 · 5 marks</span>
+              <span class="font-medium text-sm">Evaluate $\displaystyle\lim_{x \to 0} \frac{\sin 3x}{5x}$.</span>
+            </div>
+            <span class="chevron text-gray-400 text-xl ml-4">▾</span>
+          </button>
+          <div class="solution-body" id="sol-l1">
+            <div class="px-5 pb-5 pt-1 border-t border-gray-100 text-sm text-gray-700 space-y-2">
+              <p>$$\lim_{x\to 0}\frac{\sin 3x}{5x} = \frac{3}{5}\lim_{x\to 0}\frac{\sin 3x}{3x} = \frac{3}{5} \cdot 1 = \boxed{\frac{3}{5}}$$</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow border border-gray-100">
+          <button class="toggle-btn w-full flex justify-between items-center px-5 py-4 text-left" data-id="l2">
+            <div>
+              <span class="text-xs bg-teal-100 text-teal-700 px-2 py-0.5 rounded-full mr-2">2022 · 7 marks</span>
+              <span class="font-medium text-sm">Evaluate $\displaystyle\lim_{x \to 0} \frac{e^x - 1 - x}{x^2}$.</span>
+            </div>
+            <span class="chevron text-gray-400 text-xl ml-4">▾</span>
+          </button>
+          <div class="solution-body" id="sol-l2">
+            <div class="px-5 pb-5 pt-1 border-t border-gray-100 text-sm text-gray-700 space-y-2">
+              <p>Form $0/0$. Apply L'Hôpital twice:</p>
+              <p>$$\lim_{x\to 0}\frac{e^x-1-x}{x^2} \xrightarrow{L} \lim_{x\to 0}\frac{e^x-1}{2x} \xrightarrow{L} \lim_{x\to 0}\frac{e^x}{2} = \boxed{\frac{1}{2}}$$</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== SECTION: DERIVATIVES ===== -->
+    <section id="derivatives" class="section hidden">
+      <h2 class="text-2xl font-bold text-indigo-600 mb-1">Differential Calculus</h2>
+      <p class="text-gray-500 mb-6">Unit 2 · Partial derivatives, Euler's theorem, maxima &amp; minima.</p>
+
+      <div class="bg-white rounded-xl shadow p-5 mb-5">
+        <h3 class="font-semibold text-gray-700 mb-3">Key Results</h3>
+        <ul class="space-y-2 text-sm text-gray-700">
+          <li>• Chain rule: $\dfrac{dy}{dx} = \dfrac{\partial f}{\partial u}\dfrac{du}{dx} + \dfrac{\partial f}{\partial v}\dfrac{dv}{dx}$</li>
+          <li>• Euler's theorem (homogeneous degree $n$): $x\,f_x + y\,f_y = n\,f$</li>
+          <li>• Maxima/minima test: $D = f_{xx}f_{yy} - f_{xy}^2$; max if $D>0,f_{xx}<0$; min if $D>0,f_{xx}>0$.</li>
+          <li>• Rolle's theorem: If $f(a)=f(b)$, $\exists\; c\in(a,b)$ with $f'(c)=0$.</li>
+        </ul>
+      </div>
+
+      <h3 class="font-semibold text-gray-700 mb-3">Previous Year Questions</h3>
+      <div class="space-y-4">
+
+        <div class="bg-white rounded-xl shadow border border-gray-100">
+          <button class="toggle-btn w-full flex justify-between items-center px-5 py-4 text-left" data-id="d1">
+            <div>
+              <span class="text-xs bg-rose-100 text-rose-700 px-2 py-0.5 rounded-full mr-2">2023 · 8 marks</span>
+              <span class="font-medium text-sm">If $u = \ln(x^3+y^3+z^3-3xyz)$, find $\left(\dfrac{\partial}{\partial x}+\dfrac{\partial}{\partial y}+\dfrac{\partial}{\partial z}\right)^2 u$.</span>
+            </div>
+            <span class="chevron text-gray-400 text-xl ml-4">▾</span>
+          </button>
+          <div class="solution-body" id="sol-d1">
+            <div class="px-5 pb-5 pt-1 border-t border-gray-100 text-sm text-gray-700 space-y-2">
+              <p>Let $v = x^3+y^3+z^3-3xyz$. Note $v$ is homogeneous degree 3.</p>
+              <p>By Euler's theorem: $xv_x + yv_y + zv_z = 3v$.</p>
+              <p>Since $u = \ln v$: $\;u_x + u_y + u_z = \dfrac{v_x+v_y+v_z}{v}$.</p>
+              <p>Also $v_x+v_y+v_z = 3(x^2+y^2+z^2-xy-yz-zx)$ and $v=(x+y+z)(x^2+y^2+z^2-xy-yz-zx)$.</p>
+              <p>$$\therefore u_x+u_y+u_z = \frac{3}{x+y+z}$$</p>
+              <p>Applying the operator again:</p>
+              <p>$$\left(\frac{\partial}{\partial x}+\frac{\partial}{\partial y}+\frac{\partial}{\partial z}\right)^2 u = \frac{\partial}{\partial x}\frac{3}{x+y+z}+\cdots = \frac{-3}{(x+y+z)^2} \cdot 3 = \boxed{\frac{-9}{(x+y+z)^2}}$$</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow border border-gray-100">
+          <button class="toggle-btn w-full flex justify-between items-center px-5 py-4 text-left" data-id="d2">
+            <div>
+              <span class="text-xs bg-rose-100 text-rose-700 px-2 py-0.5 rounded-full mr-2">2022 · 7 marks</span>
+              <span class="font-medium text-sm">Find the extreme values of $f(x,y) = x^3 + y^3 - 3x - 3y + 4$.</span>
+            </div>
+            <span class="chevron text-gray-400 text-xl ml-4">▾</span>
+          </button>
+          <div class="solution-body" id="sol-d2">
+            <div class="px-5 pb-5 pt-1 border-t border-gray-100 text-sm text-gray-700 space-y-2">
+              <p><strong>Critical points:</strong> $f_x = 3x^2-3=0 \Rightarrow x=\pm1$; $f_y = 3y^2-3=0 \Rightarrow y=\pm1$</p>
+              <p>Four critical points: $(\pm1,\pm1)$.</p>
+              <p><strong>$D = f_{xx}f_{yy}-f_{xy}^2 = 6x\cdot6y - 0 = 36xy$</strong></p>
+              <table class="text-xs mt-2 border-collapse">
+                <thead><tr><th class="border px-2 py-1">Point</th><th class="border px-2 py-1">$D$</th><th class="border px-2 py-1">$f_{xx}$</th><th class="border px-2 py-1">Nature</th><th class="border px-2 py-1">$f$ value</th></tr></thead>
+                <tbody>
+                  <tr><td class="border px-2 py-1">$(1,1)$</td><td class="border px-2 py-1">36 > 0</td><td class="border px-2 py-1">6 > 0</td><td class="border px-2 py-1 text-green-600">Local min</td><td class="border px-2 py-1">2</td></tr>
+                  <tr><td class="border px-2 py-1">$(-1,-1)$</td><td class="border px-2 py-1">36 > 0</td><td class="border px-2 py-1">-6 < 0</td><td class="border px-2 py-1 text-red-600">Local max</td><td class="border px-2 py-1">6</td></tr>
+                  <tr><td class="border px-2 py-1">$(1,-1)$</td><td class="border px-2 py-1">-36 < 0</td><td class="border px-2 py-1">—</td><td class="border px-2 py-1 text-amber-600">Saddle</td><td class="border px-2 py-1">—</td></tr>
+                  <tr><td class="border px-2 py-1">$(-1,1)$</td><td class="border px-2 py-1">-36 < 0</td><td class="border px-2 py-1">—</td><td class="border px-2 py-1 text-amber-600">Saddle</td><td class="border px-2 py-1">—</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== SECTION: INTEGRATION ===== -->
+    <section id="integration" class="section hidden">
+      <h2 class="text-2xl font-bold text-indigo-600 mb-1">Integral Calculus</h2>
+      <p class="text-gray-500 mb-6">Unit 2 · Improper integrals, Beta &amp; Gamma functions, double integrals.</p>
+
+      <div class="bg-white rounded-xl shadow p-5 mb-5">
+        <h3 class="font-semibold text-gray-700 mb-3">Essential Formulas</h3>
+        <ul class="space-y-2 text-sm text-gray-700">
+          <li>• Gamma: $\Gamma(n) = \int_0^\infty e^{-t}t^{n-1}\,dt$; $\Gamma(n+1)=n!$ for integers.</li>
+          <li>• Beta: $B(m,n) = \int_0^1 x^{m-1}(1-x)^{n-1}\,dx = \dfrac{\Gamma(m)\Gamma(n)}{\Gamma(m+n)}$</li>
+          <li>• $\Gamma\!\left(\tfrac{1}{2}\right) = \sqrt{\pi}$</li>
+          <li>• Double integral: $\iint_R f(x,y)\,dA = \int_a^b\!\int_{g_1(x)}^{g_2(x)} f(x,y)\,dy\,dx$</li>
+        </ul>
+      </div>
+
+      <h3 class="font-semibold text-gray-700 mb-3">Previous Year Questions</h3>
+      <div class="space-y-4">
+
+        <div class="bg-white rounded-xl shadow border border-gray-100">
+          <button class="toggle-btn w-full flex justify-between items-center px-5 py-4 text-left" data-id="i1">
+            <div>
+              <span class="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full mr-2">2023 · 8 marks</span>
+              <span class="font-medium text-sm">Evaluate $\displaystyle\int_0^\infty x^4 e^{-x}\,dx$.</span>
+            </div>
+            <span class="chevron text-gray-400 text-xl ml-4">▾</span>
+          </button>
+          <div class="solution-body" id="sol-i1">
+            <div class="px-5 pb-5 pt-1 border-t border-gray-100 text-sm text-gray-700 space-y-2">
+              <p>Recognise the Gamma function:</p>
+              <p>$$\int_0^\infty x^4 e^{-x}\,dx = \Gamma(5) = 4! = \boxed{24}$$</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow border border-gray-100">
+          <button class="toggle-btn w-full flex justify-between items-center px-5 py-4 text-left" data-id="i2">
+            <div>
+              <span class="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full mr-2">2022 · 10 marks</span>
+              <span class="font-medium text-sm">Evaluate $\displaystyle\int_0^1\int_0^{1-x} e^{y/(x+y)}\,dy\,dx$ by changing the order of integration.</span>
+            </div>
+            <span class="chevron text-gray-400 text-xl ml-4">▾</span>
+          </button>
+          <div class="solution-body" id="sol-i2">
+            <div class="px-5 pb-5 pt-1 border-t border-gray-100 text-sm text-gray-700 space-y-2">
+              <p><strong>Region:</strong> $0 \le x \le 1$, $0 \le y \le 1-x$ ↔ triangle with vertices $(0,0),(1,0),(0,1)$.</p>
+              <p>Changed order: $0 \le y \le 1$, $0 \le x \le 1-y$.</p>
+              <p>Let $t = y/(x+y)$ so $x = y(1-t)/t$, $dx = -y/t^2\,dt$. When $x=0$: $t=1$; $x=1-y$: $t=y$.</p>
+              <p>After substitution the integral simplifies using Beta function to:</p>
+              <p>$$= \int_0^1 y \!\left[\int_0^1 e^t\,dt\right] dy = \frac{1}{2}(e-1) \approx \boxed{0.859}$$</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow border border-gray-100">
+          <button class="toggle-btn w-full flex justify-between items-center px-5 py-4 text-left" data-id="i3">
+            <div>
+              <span class="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full mr-2">2021 · 7 marks</span>
+              <span class="font-medium text-sm">Evaluate $B\!\left(\tfrac{3}{2},\tfrac{5}{2}\right)$.</span>
+            </div>
+            <span class="chevron text-gray-400 text-xl ml-4">▾</span>
+          </button>
+          <div class="solution-body" id="sol-i3">
+            <div class="px-5 pb-5 pt-1 border-t border-gray-100 text-sm text-gray-700 space-y-2">
+              <p>$$B\!\left(\frac{3}{2},\frac{5}{2}\right) = \frac{\Gamma(3/2)\,\Gamma(5/2)}{\Gamma(4)}$$</p>
+              <p>$$\Gamma\!\left(\frac{3}{2}\right) = \frac{1}{2}\Gamma\!\left(\frac{1}{2}\right) = \frac{\sqrt\pi}{2}$$</p>
+              <p>$$\Gamma\!\left(\frac{5}{2}\right) = \frac{3}{2}\cdot\frac{1}{2}\cdot\Gamma\!\left(\frac{1}{2}\right) = \frac{3\sqrt\pi}{4}$$</p>
+              <p>$$\Gamma(4) = 3! = 6$$</p>
+              <p>$$B = \frac{(\sqrt\pi/2)(3\sqrt\pi/4)}{6} = \frac{3\pi/8}{6} = \boxed{\frac{\pi}{16}}$$</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== SECTION: SERIES ===== -->
+    <section id="series" class="section hidden">
+      <h2 class="text-2xl font-bold text-indigo-600 mb-1">Sequences &amp; Series</h2>
+      <p class="text-gray-500 mb-6">Unit 2 · Taylor, Maclaurin, convergence tests.</p>
+
+      <div class="bg-white rounded-xl shadow p-5 mb-5">
+        <h3 class="font-semibold text-gray-700 mb-3">Common Maclaurin Series</h3>
+        <ul class="space-y-2 text-sm text-gray-700">
+          <li>• $e^x = \sum_{n=0}^{\infty}\dfrac{x^n}{n!} = 1 + x + \dfrac{x^2}{2!} + \cdots$</li>
+          <li>• $\sin x = x - \dfrac{x^3}{3!} + \dfrac{x^5}{5!} - \cdots$</li>
+          <li>• $\cos x = 1 - \dfrac{x^2}{2!} + \dfrac{x^4}{4!} - \cdots$</li>
+          <li>• $\ln(1+x) = x - \dfrac{x^2}{2} + \dfrac{x^3}{3} - \cdots$ $\;(|x|\le 1,x\neq -1)$</li>
+        </ul>
+      </div>
+
+      <h3 class="font-semibold text-gray-700 mb-3">Previous Year Questions</h3>
+      <div class="space-y-4">
+
+        <div class="bg-white rounded-xl shadow border border-gray-100">
+          <button class="toggle-btn w-full flex justify-between items-center px-5 py-4 text-left" data-id="s1">
+            <div>
+              <span class="text-xs bg-violet-100 text-violet-700 px-2 py-0.5 rounded-full mr-2">2023 · 8 marks</span>
+              <span class="font-medium text-sm">Expand $f(x) = e^x \sin x$ as a Maclaurin series up to $x^4$.</span>
+            </div>
+            <span class="chevron text-gray-400 text-xl ml-4">▾</span>
+          </button>
+          <div class="solution-body" id="sol-s1">
+            <div class="px-5 pb-5 pt-1 border-t border-gray-100 text-sm text-gray-700 space-y-2">
+              <p>Multiply series termwise (keeping up to $x^4$):</p>
+              <p>$$e^x = 1 + x + \frac{x^2}{2} + \frac{x^3}{6} + \frac{x^4}{24}+\cdots$$</p>
+              <p>$$\sin x = x - \frac{x^3}{6}+\cdots$$</p>
+              <p>Collecting by degree:</p>
+              <p>$x^1$: $1\cdot x = x$</p>
+              <p>$x^2$: $x\cdot x = x^2$</p>
+              <p>$x^3$: $\tfrac{x^2}{2}\cdot x - 1\cdot\tfrac{x^3}{6} = \tfrac{x^3}{2} - \tfrac{x^3}{6} = \tfrac{x^3}{3}$</p>
+              <p>$x^4$: $\tfrac{x^3}{6}\cdot x - x\cdot\tfrac{x^3}{6} = \tfrac{x^4}{6} - \tfrac{x^4}{6} = 0$</p>
+              <p>$$e^x\sin x = \boxed{x + x^2 + \frac{x^3}{3} + 0\cdot x^4 + \cdots}$$</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow border border-gray-100">
+          <button class="toggle-btn w-full flex justify-between items-center px-5 py-4 text-left" data-id="s2">
+            <div>
+              <span class="text-xs bg-violet-100 text-violet-700 px-2 py-0.5 rounded-full mr-2">2022 · 6 marks</span>
+              <span class="font-medium text-sm">Test the convergence of $\sum_{n=1}^{\infty} \dfrac{n}{2^n}$.</span>
+            </div>
+            <span class="chevron text-gray-400 text-xl ml-4">▾</span>
+          </button>
+          <div class="solution-body" id="sol-s2">
+            <div class="px-5 pb-5 pt-1 border-t border-gray-100 text-sm text-gray-700 space-y-2">
+              <p>Apply the Ratio Test: $a_n = n/2^n$.</p>
+              <p>$$L = \lim_{n\to\infty}\left|\frac{a_{n+1}}{a_n}\right| = \lim_{n\to\infty}\frac{n+1}{2^{n+1}}\cdot\frac{2^n}{n} = \lim_{n\to\infty}\frac{n+1}{2n} = \frac{1}{2} < 1$$</p>
+              <p>Since $L < 1$, the series <strong>converges</strong> by the Ratio Test.</p>
+              <p>(Sum $= 2$ by the formula $\sum_{n=1}^\infty nr^n = \dfrac{r}{(1-r)^2}$ with $r=1/2$.)</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== SECTION: MOCK EXAM ===== -->
+    <section id="mockexam" class="section hidden">
+      <h2 class="text-2xl font-bold text-indigo-600 mb-1">Mock Exam Generator</h2>
+      <p class="text-gray-500 mb-6">Randomly generates a timed mock paper from the PYQ bank.</p>
+
+      <div class="flex flex-wrap gap-4 items-center mb-6">
+        <div>
+          <label class="text-sm font-medium text-gray-600 block mb-1">Select Unit</label>
+          <select id="unitSelect" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+            <option value="all">Both Units</option>
+            <option value="1">Unit 1 – Algebra</option>
+            <option value="2">Unit 2 – Calculus</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-sm font-medium text-gray-600 block mb-1">Duration (minutes)</label>
+          <select id="durationSelect" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+            <option value="30">30</option>
+            <option value="60" selected>60</option>
+            <option value="90">90</option>
+          </select>
+        </div>
+        <button id="startMock" class="mt-5 bg-indigo-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-indigo-800 transition shadow">
+          ▶ Generate Mock Paper
+        </button>
+      </div>
+
+      <!-- Timer -->
+      <div id="timerBox" class="hidden mb-5 bg-white rounded-xl shadow p-4 flex items-center gap-4">
+        <span class="text-4xl font-mono font-bold text-indigo-600" id="timerDisplay">60:00</span>
+        <div class="flex gap-2">
+          <button id="pauseMock" class="bg-amber-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-amber-600 transition">Pause</button>
+          <button id="endMock" class="bg-rose-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-rose-600 transition">End &amp; Score</button>
+        </div>
+      </div>
+
+      <!-- Mock questions -->
+      <div id="mockPaper" class="space-y-4"></div>
+
+      <!-- Score result -->
+      <div id="scoreResult" class="hidden mt-6 bg-emerald-50 border border-emerald-200 rounded-xl p-6 text-center">
+        <p class="text-3xl font-bold text-emerald-700" id="scoreText"></p>
+        <p class="text-gray-600 mt-2" id="scoreDetail"></p>
+        <button id="retryMock" class="mt-4 bg-indigo-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-indigo-800 transition">Try Another Paper</button>
+      </div>
+    </section>
+
+    <!-- ===== SECTION: FORMULA SHEET ===== -->
+    <section id="formulasheet" class="section hidden">
+      <h2 class="text-2xl font-bold text-indigo-600 mb-1">Quick Formula Sheet</h2>
+      <p class="text-gray-500 mb-6">All essential formulas for the BAS101 exam at a glance.</p>
+
+      <div class="grid md:grid-cols-2 gap-5">
+
+        <div class="bg-white rounded-xl shadow p-5">
+          <h3 class="font-semibold text-indigo-700 mb-3">📐 Linear Algebra</h3>
+          <ul class="text-sm text-gray-700 space-y-2">
+            <li>$\det(AB)=\det(A)\det(B)$</li>
+            <li>$(AB)^{-1}=B^{-1}A^{-1}$</li>
+            <li>Rank-Nullity: $\rho(A)+\text{nullity}(A)=n$</li>
+            <li>$A^{-1} = \dfrac{1}{\det A}\text{adj}(A)$</li>
+            <li>Characteristic eq.: $\det(\lambda I - A)=0$</li>
+          </ul>
+        </div>
+
+        <div class="bg-white rounded-xl shadow p-5">
+          <h3 class="font-semibold text-sky-700 mb-3">ℂ Complex Numbers</h3>
+          <ul class="text-sm text-gray-700 space-y-2">
+            <li>$z = r(\cos\theta+i\sin\theta) = re^{i\theta}$</li>
+            <li>$z^n = r^n(\cos n\theta+i\sin n\theta)$</li>
+            <li>$\overline{z_1z_2}=\bar{z}_1\bar{z}_2$</li>
+            <li>$|z_1 z_2|=|z_1||z_2|$</li>
+            <li>Roots: $z_k = r^{1/n}e^{i(\theta+2k\pi)/n}$</li>
+          </ul>
+        </div>
+
+        <div class="bg-white rounded-xl shadow p-5">
+          <h3 class="font-semibold text-teal-700 mb-3">∂ Differential Calculus</h3>
+          <ul class="text-sm text-gray-700 space-y-2">
+            <li>Product rule: $(uv)'=u'v+uv'$</li>
+            <li>Quotient rule: $(u/v)'=(u'v-uv')/v^2$</li>
+            <li>$\frac{d}{dx}(x^n)=nx^{n-1}$</li>
+            <li>$\frac{d}{dx}(\ln x)=1/x$</li>
+            <li>Taylor: $f(x)=\sum\frac{f^{(n)}(a)}{n!}(x-a)^n$</li>
+          </ul>
+        </div>
+
+        <div class="bg-white rounded-xl shadow p-5">
+          <h3 class="font-semibold text-amber-700 mb-3">∫ Integral Calculus</h3>
+          <ul class="text-sm text-gray-700 space-y-2">
+            <li>$\int x^n\,dx = \dfrac{x^{n+1}}{n+1}+C$</li>
+            <li>$\int e^x\,dx = e^x+C$</li>
+            <li>$\int\sin x\,dx = -\cos x+C$</li>
+            <li>Integration by parts: $\int uv'\,dx=uv-\int u'v\,dx$</li>
+            <li>$B(m,n)=\dfrac{\Gamma(m)\Gamma(n)}{\Gamma(m+n)}$</li>
+          </ul>
+        </div>
+
+        <div class="bg-white rounded-xl shadow p-5 md:col-span-2">
+          <h3 class="font-semibold text-rose-700 mb-3">🔢 Special Gamma Values</h3>
+          <div class="grid grid-cols-3 sm:grid-cols-6 gap-3 text-center text-sm">
+            <div class="bg-rose-50 rounded-lg p-2"><p class="font-mono font-bold">$\Gamma(1)$</p><p class="text-gray-600">= 1</p></div>
+            <div class="bg-rose-50 rounded-lg p-2"><p class="font-mono font-bold">$\Gamma(2)$</p><p class="text-gray-600">= 1</p></div>
+            <div class="bg-rose-50 rounded-lg p-2"><p class="font-mono font-bold">$\Gamma(3)$</p><p class="text-gray-600">= 2</p></div>
+            <div class="bg-rose-50 rounded-lg p-2"><p class="font-mono font-bold">$\Gamma(4)$</p><p class="text-gray-600">= 6</p></div>
+            <div class="bg-rose-50 rounded-lg p-2"><p class="font-mono font-bold">$\Gamma(1/2)$</p><p class="text-gray-600">= $\sqrt{\pi}$</p></div>
+            <div class="bg-rose-50 rounded-lg p-2"><p class="font-mono font-bold">$\Gamma(3/2)$</p><p class="text-gray-600">= $\frac{\sqrt{\pi}}{2}$</p></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<footer class="bg-white border-t border-gray-200 mt-10 py-6 text-center text-xs text-gray-400">
+  BAS101 Exam Dashboard &bull; Applied Mathematics &bull; IGDTUW CSE-AI &bull;
+  Built with Tailwind CSS, Chart.js &amp; MathJax
+</footer>
+
+<script>
+/* ─────────────────────────────────────────
+   NAVIGATION
+───────────────────────────────────────── */
+const sections = document.querySelectorAll('.section');
+const navBtns  = document.querySelectorAll('[data-target]');
+
+function showSection(id) {
+  sections.forEach(s => s.classList.toggle('hidden', s.id !== id));
+  navBtns.forEach(btn => {
+    const match = btn.dataset.target === id;
+    if (btn.classList.contains('nav-item')) btn.classList.toggle('active', match);
+  });
+  // Re-typeset math in the new section
+  if (window.MathJax && MathJax.typesetPromise) {
+    MathJax.typesetPromise([document.getElementById(id)]).catch(() => {});
+  }
+}
+
+navBtns.forEach(btn => btn.addEventListener('click', () => showSection(btn.dataset.target)));
+
+// Mobile menu toggle
+document.getElementById('menuToggle').addEventListener('click', () => {
+  document.getElementById('mobileNav').classList.toggle('hidden');
+});
+
+/* ─────────────────────────────────────────
+   SOLUTION TOGGLE
+───────────────────────────────────────── */
+document.querySelectorAll('.toggle-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const id  = btn.dataset.id;
+    const sol = document.getElementById('sol-' + id);
+    const chevron = btn.querySelector('.chevron');
+    sol.classList.toggle('open');
+    chevron.textContent = sol.classList.contains('open') ? '▴' : '▾';
+    if (sol.classList.contains('open') && window.MathJax && MathJax.typesetPromise) {
+      MathJax.typesetPromise([sol]).catch(() => {});
+    }
+  });
+});
+
+/* ─────────────────────────────────────────
+   CHART.JS  – initialise after DOM ready
+───────────────────────────────────────── */
+function initCharts() {
+  // Topic-wise marks bar chart
+  new Chart(document.getElementById('marksChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Matrices', 'Eigenvalues', 'Complex', 'Limits', 'Derivatives', 'Integration', 'Series'],
+      datasets: [{
+        label: 'Avg Marks (5 yrs)',
+        data: [10, 14, 7, 6, 8, 12, 8],
+        backgroundColor: ['#6366f1','#8b5cf6','#0ea5e9','#14b8a6','#f43f5e','#f59e0b','#a78bfa'],
+        borderRadius: 6
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, max: 20, title: { display: true, text: 'Marks' } } }
+    }
+  });
+
+  // Doughnut – question types
+  new Chart(document.getElementById('typeChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Long Answer (10-12 m)', 'Short Answer (5-7 m)', 'Proof-based (5 m)'],
+      datasets: [{
+        data: [45, 35, 20],
+        backgroundColor: ['#6366f1', '#f59e0b', '#10b981'],
+        borderWidth: 2
+      }]
+    },
+    options: {
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { size: 11 } } }
+      }
+    }
+  });
+
+  // Line – difficulty trend
+  new Chart(document.getElementById('difficultyChart'), {
+    type: 'line',
+    data: {
+      labels: ['2019', '2020', '2021', '2022', '2023'],
+      datasets: [
+        { label: 'Unit 1 Difficulty', data: [6, 7, 5, 8, 7], borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.1)', tension: 0.4, fill: true },
+        { label: 'Unit 2 Difficulty', data: [5, 6, 7, 7, 9], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', tension: 0.4, fill: true }
+      ]
+    },
+    options: {
+      plugins: { legend: { position: 'bottom' } },
+      scales: {
+        y: { min: 1, max: 10, title: { display: true, text: 'Difficulty (1-10)' } }
+      }
+    }
+  });
+}
+
+// Charts are on the analytics page; init when it first becomes visible
+let chartsInited = false;
+const origShow = showSection;
+window.showSection = function(id) {
+  origShow(id);
+  if (id === 'analytics' && !chartsInited) {
+    chartsInited = true;
+    initCharts();
+  }
+};
+// Wire nav again with the wrapped version
+navBtns.forEach(btn => {
+  btn.replaceWith(btn.cloneNode(true)); // remove old listener
+});
+document.querySelectorAll('[data-target]').forEach(btn => {
+  btn.addEventListener('click', () => window.showSection(btn.dataset.target));
+});
+// Re-wire solution toggles (still valid, original ones removed)
+document.querySelectorAll('.toggle-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const id  = btn.dataset.id;
+    const sol = document.getElementById('sol-' + id);
+    const chevron = btn.querySelector('.chevron');
+    if (!sol) return;
+    sol.classList.toggle('open');
+    chevron.textContent = sol.classList.contains('open') ? '▴' : '▾';
+    if (sol.classList.contains('open') && window.MathJax && MathJax.typesetPromise) {
+      MathJax.typesetPromise([sol]).catch(() => {});
+    }
+  });
+});
+
+/* ─────────────────────────────────────────
+   MOCK EXAM
+───────────────────────────────────────── */
+const QUESTION_BANK = [
+  // Unit 1
+  { unit: 1, topic: 'Matrices', marks: 5,  q: 'Find the rank of $A=\\begin{pmatrix}1&2&-1\\3&6&-3\\2&4&-2\\end{pmatrix}$.',
+    a: 'Row reduce: all rows are multiples of first row → rank = $\\boxed{1}$.' },
+  { unit: 1, topic: 'Matrices', marks: 8,  q: 'Apply Cayley-Hamilton to $A=\\begin{pmatrix}1&2\\2&1\\end{pmatrix}$ and find $A^{-1}$.',
+    a: 'Char. eq: $\\lambda^2-2\\lambda-3=0$. By CH: $A^2-2A-3I=0 \\Rightarrow A^{-1}=\\frac{1}{3}(A-2I)=\\frac{1}{3}\\begin{pmatrix}-1&2\\\\2&-1\\end{pmatrix}$.' },
+  { unit: 1, topic: 'Eigenvalues', marks: 10, q: 'Find eigenvalues and eigenvectors of $A=\\begin{pmatrix}3&1\\1&3\\end{pmatrix}$.',
+    a: '$\\lambda_1=4,\\lambda_2=2$; eigenvectors $\\begin{pmatrix}1\\\\1\\end{pmatrix}$ and $\\begin{pmatrix}1\\\\-1\\end{pmatrix}$.' },
+  { unit: 1, topic: 'Eigenvalues', marks: 12, q: 'Diagonalize $A=\\begin{pmatrix}2&0&0\\0&3&0\\0&0&4\\end{pmatrix}$.',
+    a: 'Already diagonal! $D=A$, $P=I$. Eigenvalues are 2, 3, 4.' },
+  { unit: 1, topic: 'Complex', marks: 5,   q: 'Express $(1+i)^8$ in standard form.',
+    a: '$|1+i|=\\sqrt{2}$, $\\arg=\\pi/4$. $(1+i)^8=(\\sqrt{2})^8 e^{i2\\pi}=16.$' },
+  { unit: 1, topic: 'Complex', marks: 6,   q: 'Find all 4th roots of unity.',
+    a: '$\\omega^k=e^{2\\pi ik/4}=i^k$ for $k=0,1,2,3$: $\\{1,i,-1,-i\\}$.' },
+  // Unit 2
+  { unit: 2, topic: 'Limits', marks: 5,   q: 'Evaluate $\\lim_{x\\to 0}\\dfrac{\\tan x - \\sin x}{x^3}$.',
+    a: 'Use Taylor expansion: $\\tan x-\\sin x\\approx x^3/2$ near 0 → limit $= 1/2$.' },
+  { unit: 2, topic: 'Limits', marks: 5,   q: 'Find $\\lim_{x\\to\\infty}\\left(1+\\dfrac{3}{x}\\right)^x$.',
+    a: '$\\lim=e^{\\lim x\\cdot\\ln(1+3/x)}=e^{3}=\\boxed{e^3}$.' },
+  { unit: 2, topic: 'Derivatives', marks: 8, q: 'If $u=\\sin^{-1}\\dfrac{x+y}{\\sqrt{x}+\\sqrt{y}}$, show $x\\,u_x+y\\,u_y=\\tfrac{1}{2}\\tan u$.',
+    a: 'Note $\\sin u=f(x,y)$ is homogeneous degree $1/2$. By Euler\'s theorem for $\\sin u$: result follows.' },
+  { unit: 2, topic: 'Derivatives', marks: 7, q: 'Expand $\\ln(1+\\sin x)$ by Maclaurin series up to $x^3$.',
+    a: '$\\ln(1+\\sin x)=x-\\dfrac{x^2}{2}+\\dfrac{x^3}{6}-\\cdots$' },
+  { unit: 2, topic: 'Integration', marks: 8, q: 'Evaluate $\\int_0^1 x^3(1-x)^4\\,dx$.',
+    a: '$=B(4,5)=\\dfrac{\\Gamma(4)\\Gamma(5)}{\\Gamma(9)}=\\dfrac{3!\\cdot4!}{8!}=\\dfrac{6\\cdot24}{40320}=\\dfrac{1}{280}$.' },
+  { unit: 2, topic: 'Integration', marks: 10, q: 'Evaluate $\\int_0^\\infty e^{-x^2}\\,dx$.',
+    a: '$=\\dfrac{\\sqrt{\\pi}}{2}$ (using $\\Gamma(1/2)=\\sqrt{\\pi}$ and substitution $t=x^2$).' },
+  { unit: 2, topic: 'Series', marks: 8,  q: 'Test convergence of $\\sum_{n=1}^\\infty \\dfrac{(-1)^n}{n}$.',
+    a: 'Alternating series with $a_n=1/n\\to 0$ decreasingly → converges by Alternating Series Test (conditionally).' },
+  { unit: 2, topic: 'Series', marks: 6,  q: 'Find the Maclaurin series for $\\cos^2 x$ up to $x^4$.',
+    a: '$\\cos^2 x=\\dfrac{1+\\cos 2x}{2}=1-x^2+\\dfrac{x^4}{3}-\\cdots$' }
+];
+
+let mockInterval = null;
+let mockSecondsLeft = 0;
+let mockPaused = false;
+let currentMockQuestions = [];
+
+function generateMock() {
+  const unit = document.getElementById('unitSelect').value;
+  const duration = parseInt(document.getElementById('durationSelect').value);
+
+  let pool = QUESTION_BANK;
+  if (unit === '1') pool = pool.filter(q => q.unit === 1);
+  if (unit === '2') pool = pool.filter(q => q.unit === 2);
+
+  // Shuffle and pick ~5-7 questions targeting ~40-60 marks
+  const shuffled = [...pool].sort(() => Math.random() - 0.5);
+  let total = 0;
+  const selected = [];
+  for (const q of shuffled) {
+    if (total + q.marks <= 60 && selected.length < 7) {
+      selected.push(q);
+      total += q.marks;
+    }
+    if (total >= 40) break;
+  }
+  currentMockQuestions = selected;
+
+  // Render questions
+  const paper = document.getElementById('mockPaper');
+  paper.innerHTML = '';
+  selected.forEach((q, idx) => {
+    const div = document.createElement('div');
+    div.className = 'bg-white rounded-xl shadow border border-gray-100 p-5';
+    div.innerHTML = `
+      <div class="flex justify-between items-start mb-2">
+        <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">Q${idx+1} · ${q.topic} · ${q.marks} marks</span>
+      </div>
+      <p class="text-sm font-medium text-gray-800 mb-3">\\(${q.q}\\)</p>
+      <button class="mock-reveal text-xs text-indigo-600 underline" data-idx="${idx}">Show Answer</button>
+      <div class="mock-answer hidden mt-3 p-3 bg-emerald-50 rounded-lg text-sm text-gray-700">\\(${q.a}\\)</div>
+    `;
+    paper.appendChild(div);
+  });
+
+  // Bind reveal buttons
+  document.querySelectorAll('.mock-reveal').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const ans = btn.nextElementSibling;
+      ans.classList.toggle('hidden');
+      btn.textContent = ans.classList.contains('hidden') ? 'Show Answer' : 'Hide Answer';
+      if (!ans.classList.contains('hidden') && window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([ans]).catch(() => {});
+      }
+    });
+  });
+
+  if (window.MathJax && MathJax.typesetPromise) {
+    MathJax.typesetPromise([paper]).catch(() => {});
+  }
+
+  // Start timer
+  mockSecondsLeft = duration * 60;
+  mockPaused = false;
+  document.getElementById('timerBox').classList.remove('hidden');
+  document.getElementById('scoreResult').classList.add('hidden');
+  updateTimerDisplay();
+  clearInterval(mockInterval);
+  mockInterval = setInterval(tickTimer, 1000);
+
+  document.getElementById('mocksTaken').textContent =
+    (parseInt(document.getElementById('mocksTaken').textContent) + 1);
+}
+
+function tickTimer() {
+  if (mockPaused) return;
+  mockSecondsLeft--;
+  updateTimerDisplay();
+  if (mockSecondsLeft <= 0) {
+    clearInterval(mockInterval);
+    showScore(true);
+  }
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(mockSecondsLeft / 60);
+  const s = mockSecondsLeft % 60;
+  const el = document.getElementById('timerDisplay');
+  el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  el.classList.toggle('timer-warning', mockSecondsLeft <= 120);
+}
+
+function showScore(timeUp) {
+  clearInterval(mockInterval);
+  const total = currentMockQuestions.reduce((a, q) => a + q.marks, 0);
+  const revealed = document.querySelectorAll('.mock-answer:not(.hidden)').length;
+  const score = Math.max(0, total - revealed * 2); // small penalty for peeks
+  document.getElementById('scoreText').textContent = `Score: ${score} / ${total}`;
+  document.getElementById('scoreDetail').textContent = timeUp
+    ? 'Time is up! Here is your estimated score.'
+    : `You attempted ${currentMockQuestions.length} questions. Keep practising!`;
+  document.getElementById('scoreResult').classList.remove('hidden');
+  document.getElementById('practiceScore').textContent = score;
+}
+
+document.getElementById('startMock').addEventListener('click', generateMock);
+
+document.getElementById('pauseMock').addEventListener('click', () => {
+  mockPaused = !mockPaused;
+  document.getElementById('pauseMock').textContent = mockPaused ? 'Resume' : 'Pause';
+});
+
+document.getElementById('endMock').addEventListener('click', () => showScore(false));
+document.getElementById('retryMock').addEventListener('click', () => {
+  document.getElementById('mockPaper').innerHTML = '';
+  document.getElementById('timerBox').classList.add('hidden');
+  document.getElementById('scoreResult').classList.add('hidden');
+  clearInterval(mockInterval);
+});
+
+/* Initial typeset for visible section */
+window.addEventListener('load', () => {
+  if (window.MathJax && MathJax.typesetPromise) {
+    MathJax.typesetPromise([document.getElementById('overview')]).catch(() => {});
+  }
+});
+</script>
+</body>
+</html>
