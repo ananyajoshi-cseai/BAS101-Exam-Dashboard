@@ -1,5 +1,9 @@
 # 📊 Math Prep 101: BAS 101 Exam Dashboard
 
+**Live Demo:** [🚀 View the Interactive Dashboard](https://ananyajoshi-cseai.github.io/BAS101-Exam-Dashboard/)
+
+---
+
 An interactive, high-utility study dashboard designed for **Applied Mathematics (BAS 101)** students at **IGDTUW**. This project streamlines midterm and end-term revision by combining data visualization with active recall strategies.
 
 ## 🚀 Features
