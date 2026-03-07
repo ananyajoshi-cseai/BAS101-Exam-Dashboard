@@ -1,6 +1,6 @@
 # 📊 Math Prep 101: BAS 101 Exam Dashboard
 
-**Live Demo:** [🚀 View the Interactive Dashboard](https://ananyajoshi-cseai.github.io/BAS101-Exam-Dashboard/)
+[![Live Demo](https://img.shields.io/badge/demo-live_now-green?style=for-the-badge&logo=vercel)](https://ananyajoshi-cseai.github.io/BAS101-Exam-Dashboard/)
 
 ---
 
