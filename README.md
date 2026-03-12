@@ -42,8 +42,9 @@ A full-length practice paper designed based on current exam trends.
 ## 📂 Project Structure
 
 * `index.html`: The core application containing the dashboard logic, styles, and question database.
-* **Units Covered:** * **Unit 1:** Linear Algebra (Rank, Echelon form, Eigenvalues, Cayley-Hamilton Theorem).
-    * **Unit 2:** Differential Calculus (Leibnitz Theorem, Euler's Theorem, Maxima/Minima).
+* **Units Covered:**
+  * **Unit 1:** Linear Algebra (Rank, Echelon form, Eigenvalues, Cayley-Hamilton Theorem).
+  * **Unit 2:** Differential Calculus (Leibnitz Theorem, Euler's Theorem, Maxima/Minima).
 
 ## 👩‍💻 About the Developer
 
