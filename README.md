@@ -9,7 +9,7 @@ An interactive, high-utility study dashboard designed for **Applied Mathematics 
 ## 📸 App Preview
 
 ### 📊 Exam Analytics & Topic Frequency
-Visualizes which topics appear most frequently in the last three years of IGDTUW papers.
+It Visualizes which topics appear most frequently in the last three years of IGDTUW papers.
 ![Exam Analytics Interface](./screenshots/dashboard1.png)
 
 ### 📄 Interactive PYQs with Solutions
