@@ -4,7 +4,7 @@
 
 ---
 
-An interactive, high-utility study dashboard designed for **Applied Mathematics (BAS 101)** students at **IGDTUW**. This project streamlines midterm and end-term revision by combining data visualization with active recall strategies.
+An interactive, high-utility study dashboard designed for **Applied Mathematics (BAS 101)** students at **IGDTUW**. This project streamlines midterm and end-term revision by combining data visualization with active recall strategies!
 
 ## 📸 App Preview
 
