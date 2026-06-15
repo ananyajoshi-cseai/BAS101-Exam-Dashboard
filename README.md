@@ -26,7 +26,7 @@ A full-length practice paper designed based on current exam trends.
 ---
 ## 🚀 Features
 
-* **Exam Topic Analytics:** Dynamic bar charts powered by **Chart.js** that visualize the frequency of topics across three years of PYQs (Oct '24, Mar '25, Oct '25).
+* **Exam Topic Analytics:** Dynamic bar charts powered by **Chart.js** that visualize the frequency of topics across three years of PYQs.
 * **Active Recall Solutions:** Hidden "Toggle Solution" blocks for over 30 questions to encourage self-testing before viewing the correct answer.
 * **LaTeX Integration:** High-fidelity mathematical rendering using **MathJax** for complex Linear Algebra and Calculus proofs.
 * **Predictive Mock Exam:** A full-length mock paper based on high-yield trends identified in recent exam cycles.
