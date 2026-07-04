@@ -4,12 +4,12 @@
 
 ---
 
-An interactive, high-utility study dashboard designed for **Applied Mathematics (BAS 101)** students at **IGDTUW**. This project streamlines midterm and end-term revision by combining data visualization with active recall strategies
+An interactive, high-utility study dashboard designed for **Applied Mathematics (BAS 101)** students at **IGDTUW**. This project streamlines midterm and end-term revision by combining data visualization with active recall strategies.
 
 ## 📸 App Preview
 
 ### 📊 Exam Analytics & Topic Frequency
-It Visualizes which topics appear most frequently in the last three years of IGDTUW papers
+It Visualizes which topics appear most frequently in the last three years of IGDTUW papers.
 ![Exam Analytics Interface](./screenshots/Dashboard1.png)
 
 ### 📄 Interactive PYQs with Solutions
