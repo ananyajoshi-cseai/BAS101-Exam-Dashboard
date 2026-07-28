@@ -12,13 +12,13 @@ An interactive, high-utility study dashboard designed for **Applied Mathematics 
 It Visualizes which topics appear most frequently in the last three years of IGDTUW papers
 ![Exam Analytics Interface](./screenshots/Dashboard1.png)
 
-### 📄 Interactive PYQs with Solutions
-Toggleable step-by-step solutions for past paper questions (Linear Algebra & Calculus)
-![PYQ Solution View](./screenshots/Dashboard%202.png)
-
 ### 📚 Study Materials & Methods
 Quick access to high-yield formulas like Euler's and Leibnitz Theorem.
 ![Key Methods Section](./screenshots/Dashboard%203.png)
+
+### 📄 Interactive PYQs with Solutions
+Toggleable step-by-step solutions for past paper questions (Linear Algebra & Calculus)
+![PYQ Solution View](./screenshots/Dashboard%202.png)
 
 ### 📝 Predicted Mock Exam
 A full-length practice paper designed based on current exam trends.
