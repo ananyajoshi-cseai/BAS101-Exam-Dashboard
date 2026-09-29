@@ -24,7 +24,7 @@ Toggleable step-by-step solutions for past paper questions (Linear Algebra & Cal
 A full-length practice paper designed based on current exam trends.
 ![Mock Exam Interface](./screenshots/Dashboard%204.png)
 ---
-## 🚀 Features
+##  Features
 
 * **Exam Topic Analytics:** Dynamic bar charts powered by **Chart.js** that visualize the frequency of topics across three years of PYQs.
 * **Active Recall Solutions:** Hidden "Toggle Solution" blocks for over 30 questions to encourage self-testing before viewing the correct answer.
